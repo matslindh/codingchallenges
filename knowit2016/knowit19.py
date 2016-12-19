@@ -1,11 +1,12 @@
 import string
 
 out = open("input/knowit19_output.pgm", "w")
-out_bin = open("input/knowit19_output.bin", "wb")
+#out_bin = open("input/knowit19_output.bin", "wb")
 s = ''.join(open("input/knowit19").readlines()).replace("\n", '')
 
 for i in range(0, len(s), 2):
-    out_bin.write(chr(int(s[i:i + 2])).encode("ascii"))
+    pass
+    #out_bin.write(chr(int(s[i:i + 2])).encode("ascii"))
 
 height = 21
 width = int(len(s) / (height * 2))
