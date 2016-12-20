@@ -122,7 +122,6 @@ while 1:
             allowed_count += (limit - idx) + 1
             break
 
-        print("Skipping to", next, 'idx is', idx, 'adding', next-1-idx, ' allowed count was ', allowed_count)
         allowed_count += next - idx
         idx = next
     else:
