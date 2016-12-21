@@ -1,0 +1,8 @@
+swap position 4 with position 0 :ebcda
+swap letter d with letter b :edcba
+reverse positions 0 through 4 :abcde
+rotate left 1 step :bcdea
+move position 1 to position 4 :bdeac
+move position 3 to position 0 :abdec
+rotate based on position of letter b :ecabd
+rotate based on position of letter d :decab
