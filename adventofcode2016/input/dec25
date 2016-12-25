@@ -1,0 +1,30 @@
+cpy a d   #
+cpy 4 c   #
+cpy 643 b #
+inc d     #
+dec b     #
+jnz b -2  #
+dec c     #
+jnz c -5  # a + 643 * 4
+cpy d a   #                                      <--+
+jnz 0 0   # nop                                <--+ |                   while (a) {
+cpy a b   # b = a                                 | |                     b = a;
+cpy 0 a   # a = 0                                 | |                     a = 0;
+cpy 2 c   # c = 2               <--+              | |                     c = 2;
+jnz b 2   # jmp +2   -->+          |              | |                     while (b) {
+jnz 1 6   # jmp +6      |   -->----|--+           | |                         b--;
+dec b     # b--      <--+          |  |           | |                         c--;
+dec c     # c--                    |  |           | |                         if !c
+jnz c -4  # for b--, c-- (b -= 2)  |  |           | |                           break
+inc a     # a++                    |  |           | |
+jnz 1 -7  # jmp -7              -->+  |           | |
+cpy 2 b   # b = 2           <---------+           | |
+jnz c 2   #          -->+                         | |
+jnz 1 4   # jmp +4      |  -->+                   | |
+dec b     #          <--+     |                   | |
+dec c     #                   |                   | |
+jnz 1 -4  #                   |                   | |
+jnz 0 0   # nop            <--+                   | |
+out b     # print(b)                              | |
+jnz a -19 #                                    -->+ |
+jnz 1 -21 #                                      -->+
