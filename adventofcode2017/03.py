@@ -30,12 +30,14 @@ def distance(n):
     offset = abs(offset)
     # print(offset, layer, p_start, p_ur, p_ul, p_ll, p_lr, n, c, c**2)
     return layer + offset
-    
+
+
 def test_distance():
     assert 0 == distance(1)
     assert 3 == distance(12)
     assert 2 == distance(23)
     assert 31 == distance(1024)
+
 
 if __name__ == "__main__":
     print(distance(289326))
