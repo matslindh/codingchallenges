@@ -29,10 +29,10 @@ def navigate_grid(instructions):
 
 
 def test_navigate_grid():
-    assert 3 == navigate_grid('ne,ne,ne'.split(','))
-    assert 0 == navigate_grid('ne,ne,sw,sw'.split(','))
-    assert 2 == navigate_grid('ne,ne,s,s'.split(','))
-    assert 3 == navigate_grid('se,sw,se,sw,sw'.split(','))
+    assert (3, 3) == navigate_grid('ne,ne,ne'.split(','))
+    assert (0, 2) == navigate_grid('ne,ne,sw,sw'.split(','))
+    assert (2, 2) == navigate_grid('ne,ne,s,s'.split(','))
+    assert (3, 3) == navigate_grid('se,sw,se,sw,sw'.split(','))
 
 
 if __name__ == "__main__":
