@@ -1,41 +1,55 @@
-set i 31
-set a 1
-mul p 17
-jgz p p
-mul a 2
-add i -1
-jgz i -2
-add a -1
-set i 127
-set p 735
-mul p 8505
-mod p a
-mul p 129749
-add p 12345
-mod p a
-set b p
-mod b 10000
-snd b
-add i -1
-jgz i -9
-jgz a 3
-rcv b
-jgz b -1
-set f 0
-set i 126
-rcv a
-rcv b
-set p a
-mul p -1
-add p b
-jgz p 4
-snd a
-set a b
-jgz 1 3
-snd b
-set f 1
-add i -1
-jgz i -11
-snd a
-jgz f -16
-jgz a -19
+set i 31            # i = 31
+set a 1             # a = 1
+mul p 17            # p *= 17
+jgz p p             # p > 0 ? -> p                                      ->
+mul a 2          5  # a *= 2               <-                             |
+add i -1            # i--                    |                            |
+jgz i -2            # i > 0 ? -> 5         ->                             |
+add a -1            # a--                                                 |
+set i 127           # i = 127                                             |
+set p 735           # p = 735                                             |
+mul p 8505       11 # p *= 8505                                 <-        |
+mod p a             # p = p % a                                   |       |
+mul p 129749        # p *= 129749                                 |       |
+add p 12345         # p += 12345                                  |       |
+mod p a             # p = p % a                                   |       |
+set b p             # b = p                                       |       |
+mod b 10000         # b = b % 10000                               |       |
+snd b               # send(b)                                     |       |
+add i -1            # i--                                         |       |
+jgz i -9            # i > 0 ? -> 11                             ->        |
+jgz a 3             # a > 0 ? -> 24                        ->           <-
+rcv b               # read until 0 received             <-   |
+jgz b -1            #                                     |  |
+set f 0          24 # f = 0                          <- <-+--
+set i 126           # i = 126                          |  |
+rcv a               # read(a)                          |  |
+rcv b            27 # read(b)                     <-   |  |
+set p a             # p = a                         |  |  |
+mul p -1            # p *= -1                       |  |  |
+add p b             # p += b                        |  |  |
+jgz p 4             # p > 0 ? -> 35   ->            |  |  |
+snd a               # send(a)           .           |  |  |
+set a b             # a = b             .           |  |  |
+jgz 1 3             # -> 37             .   ->      |  |  |
+snd b            35 # send b          <-      |     |  |  |
+set f 1             # f = 1                   |     |  |  |
+add i -1         37 # decrement i           <-      |  |  |
+jgz i -11           # read again, -> 27           ->   |  |
+snd a               # send(a)                          |  |
+jgz f -16 # -> 24   # f > 0 -> 24                    ->   |
+jgz a -19 # -> 22   # END OF PROGRAM                    ->
+
+f = 0
+
+a = recv()
+
+for (i = 126; i > 0; i--) {
+    b = recv()
+
+    p = a
+    p *= -1
+    p += b
+
+    p > 0 ? send(b)
+}

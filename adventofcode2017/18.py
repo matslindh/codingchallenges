@@ -74,13 +74,13 @@ def execute_multiple(instructions, program_id, input, output):
         if reg not in registers:
             registers[reg] = 0
         
-        if len(instr) > 2:
+        if len(instr) > 2 and instr[2]:
             op = op_value(instr[2])
 
         if cmd == 'snd':
             output.append(op_value(reg))
             sent += 1
-            # print(program_id, "sending", reg, '=', registers[reg])
+            # print(program_id, pc, "sending", reg, '=', registers[reg])
         elif cmd == 'set':
             registers[reg] = op
         elif cmd == 'add':
@@ -92,12 +92,12 @@ def execute_multiple(instructions, program_id, input, output):
         elif cmd == 'rcv':
             if input:
                 registers[reg] = input.popleft()
-                # print(program_id, "receiving", reg, '=', registers[reg])
+                #print(program_id, pc, "receiving", reg, '=', registers[reg])
             else:
                 yield pc, sent
                 pc -= 1
         elif cmd == 'jgz':
-            if registers[reg] > 0:
+            if op_value(reg) > 0:
                 pc += op
                 continue
 
