@@ -135,9 +135,11 @@ def execute_parallel(instructions):
 
 def test_execute():
     assert 4 == execute(open("input/dec18_test").readlines())
-    
+
+
 def test_execute_parallel():
     assert 3 == execute_parallel(open("input/dec18_test_b").readlines())
+
 
 if __name__ == "__main__":
     print(execute(open("input/dec18").readlines()))
