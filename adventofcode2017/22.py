@@ -135,4 +135,4 @@ def test_explore_virus_extended():
 if __name__ == "__main__":
     print(explore_virus(10000, open("input/dec22").readlines()))
     # 5576716 too high
-    print(explore_virus(10000000, open("input/dec22").readlines()))
+    print(explore_virus(10000000, open("input/dec22").readlines(), extended=True))
