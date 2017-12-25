@@ -65,7 +65,7 @@ def find_shortest_path(inp, n):
 
         if len(not_done) % 100 == 0:
             print(len(not_done))
-                
+
     return portals[n-1][n-1]['shortest']
 
     
