@@ -1,5 +1,5 @@
-import math
-from functools import reduce
+import time
+start = time.clock()
 
 
 def gen_primes(s):
@@ -23,34 +23,39 @@ def gen_primes(s):
 primes = gen_primes(2**10)
 
 
-def gen_christmas_numbers(limit, factors = 24):
+def prime_index_product(l):
+    number = 1
+
+    for idx in l:
+        number *= primes[idx]
+
+    return number
+
+
+def gen_christmas_numbers(limit, factors=24):
     prime_index = [0] * factors
     christnumbers = {}
 
-    increment = 0
-    max_increment = 0
+    while True:
+        increment = 0
+        number = prime_index_product(prime_index)
 
-    while increment < 2:
-        while True:
-            number = 1
-            print(prime_index)
+        while number > limit:
+            increment += 1
 
-            for idx in prime_index:
-                number *= primes[idx]
+            if increment > 14:
+                return christnumbers
 
-            if number > limit:
-                increment += 1
-                prime_index[increment] += 1
-
-                for y in range(0, increment):
-                    prime_index[y] = prime_index[increment]
-
-                break
-
-            christnumbers[number] = True
             prime_index[increment] += 1
 
-    return christnumbers
+            for y in range(0, increment):
+                prime_index[y] = prime_index[increment]
+
+            number = prime_index_product(prime_index)
+
+        # print(prime_index)
+        christnumbers[number] = True
+        prime_index[0] += 1
 
 
 def test_christmas_number():
@@ -66,5 +71,10 @@ def test_christmas_number():
     assert c == 3
 
 
-numbers = gen_christmas_numbers(2**32+1)
-print(len(numbers))
+if __name__ == '__main__':
+    numbers = gen_christmas_numbers(2**32+1)
+    print(len(numbers))
+
+    print("time: " + str(time.clock() - start))
+
+
