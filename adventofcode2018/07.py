@@ -36,7 +36,6 @@ def assembly_instructions(f):
 
     heap = list(start)
     heapify(heap)
-    seen = {}
     s = ''
     from_ = {}
 
@@ -71,7 +70,7 @@ def assembly_instructions(f):
     return s
 
 
-def assembly_in_parallel(f, workers):
+def assembly_in_parallel(f, workers, duration=0):
     steps = {}
     deps = {}
     seen = {}
@@ -100,15 +99,51 @@ def assembly_in_parallel(f, workers):
     start = set((seen.keys()) - set(steps.keys()))
     end = set((seen.keys()) - set(deps.keys())).pop()
     ready = {}
+    heap = []
 
     for obj in start:
-        ready[obj] = True
+        heap.append((0, obj))
 
-    workers_busy_for = [0] * workers
-    workers_heap = heapify(workers_busy_for)
+    heapify(heap)
+    s = ''
 
+    workers_heap = [0] * workers
+    heapify(workers_heap)
 
+    while heap:
+        earliest_start_at, current = heappop(heap)
+        ready[current] = True
+        # print("current", current)
 
+        if current not in deps:
+            continue
+
+        wake_at = heappop(workers_heap)
+        # print("wake_at", wake_at, "earliest_start_at", earliest_start_at)
+        time = max(wake_at, earliest_start_at)
+        heappush(workers_heap, duration + time + ord(current) - 64)
+        # print("time is now", time)
+
+        s += current
+
+        for n in deps[current]['leads']:
+            is_ready = True
+
+            for prev in steps[n]['deps']:
+                # print("checking ", prev)
+                if prev not in ready:
+                    # print("   NOT READY")
+                    is_ready = False
+
+            if is_ready and n not in heap:
+                # print(" + adding to heap, ", n)
+                heappush(heap, (duration + time + ord(current) - 64, n))
+
+        print(heap)
+        print(workers_heap)
+
+    # - 63 since that's when everyone has finished
+    return min(workers_heap) + ord(end) - 63
 
 
 def test_assembly_instructions():
@@ -121,4 +156,7 @@ def test_assembly_in_parallel():
 
 if __name__ == '__main__':
     print(assembly_instructions(open('input/07')))
+
+    # 554 too low
+    print(assembly_in_parallel(open('input/07'), 5, 60))
 
