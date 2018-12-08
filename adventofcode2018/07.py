@@ -97,7 +97,6 @@ def assembly_in_parallel(f, workers, duration=0):
         deps[finished]['leads'].append(step)
 
     start = set((seen.keys()) - set(steps.keys()))
-    end = set((seen.keys()) - set(deps.keys())).pop()
     ready = {}
     heap = []
 
@@ -109,41 +108,45 @@ def assembly_in_parallel(f, workers, duration=0):
 
     workers_heap = [0] * workers
     heapify(workers_heap)
+    print(deps)
 
     while heap:
         earliest_start_at, current = heappop(heap)
-        ready[current] = True
-        # print("current", current)
-
-        if current not in deps:
-            continue
-
         wake_at = heappop(workers_heap)
         # print("wake_at", wake_at, "earliest_start_at", earliest_start_at)
         time = max(wake_at, earliest_start_at)
-        heappush(workers_heap, duration + time + ord(current) - 64)
+        ready[current] = duration + time + ord(current) - 64
+        print(current, "time", time, "ready at", ready[current])
+        heappush(workers_heap, ready[current])
         # print("time is now", time)
 
         s += current
 
-        for n in deps[current]['leads']:
-            is_ready = True
+        if current in deps:
+            for n in deps[current]['leads']:
+                is_ready = True
+                latest_ready_at = 0
 
-            for prev in steps[n]['deps']:
-                # print("checking ", prev)
-                if prev not in ready:
-                    # print("   NOT READY")
-                    is_ready = False
+                for prev in steps[n]['deps']:
+                    # print("checking ", prev)
+                    if prev not in ready:
+                        # print("   NOT READY")
+                        is_ready = False
+                        break
 
-            if is_ready and n not in heap:
-                # print(" + adding to heap, ", n)
-                heappush(heap, (duration + time + ord(current) - 64, n))
+                    latest_ready_at = max(latest_ready_at, ready[prev])
 
+                if is_ready and n not in heap:
+                    # print(" + adding to heap, ", n)
+                    heappush(heap, (latest_ready_at, n))
+
+        print("processed", current)
         print(heap)
         print(workers_heap)
 
+    print(s)
     # - 63 since that's when everyone has finished
-    return min(workers_heap) + ord(end) - 63
+    return max(workers_heap)
 
 
 def test_assembly_instructions():
