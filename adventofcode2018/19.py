@@ -62,6 +62,10 @@ def eqrr(registers, a, b, c):
     registers[c] = int(registers[a] == registers[b])
 
 
+def noop(registers, a, b, c):
+    pass
+
+
 def execute(f, start_0=0):
     program = [line.strip() for line in f.readlines()]
     registers = [0] * 6
@@ -74,18 +78,27 @@ def execute(f, start_0=0):
             bound_to = int(program[pc][4:])
             del program[pc]
         else:
+            pre_pc = pc
+
             if bound_to is not None:
                 registers[bound_to] = pc
 
+            registers_pre = list(registers)
             op_code, in_a, in_b, out = program[pc].split(' ')
+
             globals()[op_code](registers, int(in_a), int(in_b), int(out))
+
+            print(registers_pre, pc, op_code, in_a, in_b, out, registers)
 
             if bound_to is not None:
                 pc = registers[bound_to]
 
+            if pre_pc != pc:
+                print(" pc was changed from ", pre_pc, "to", pc)
+
             pc += 1
 
-            print(registers)
+            input('enter')
 
     return registers[0]
 
@@ -95,7 +108,7 @@ def test_execute():
 
 
 if __name__ == '__main__':
-    print(execute(open('input/19')))
+    #print(execute(open('input/19')))
     print(execute(open('input/19'), start_0=1))
 
 

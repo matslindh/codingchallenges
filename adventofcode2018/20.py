@@ -19,93 +19,150 @@ def build_graph(s):
 
     nodes_by_coordinate = {}
 
-    def process_node(node, x, y, s):
-        print("processing ", x, y, s)
+    def process_node(node, s):
+        print(" down ")
         i = 0
-        calling = [x, y, node]
+        calling_node = node
+        nodes = [node]
+        exit_nodes = []
 
         while i < len(s):
             c = s[i]
-            print("at", x, y, c)
 
             if c == '(':
-                i += process_node(node, x, y, s[i+1:])
-                print("got back")
+                process = list(nodes)
+                nodes = []
+
+                for n in process:
+                    skip, exit_nodes = process_node(n, s[i+1:])
+                    nodes += exit_nodes
+
+                i += skip
+                print('up', len(nodes))
+                #print("returned, continuing processing of ", s[i+1:])
+                #print([str(n) for n in exit_nodes])
             elif c == '|':
-                x, y, node = calling
+                #print("this time we got to", nodes)
+                exit_nodes += nodes
+                nodes = [calling_node]
             elif c == ')':
-                return i + 1
+                return i + 1, nodes + exit_nodes
             else:
-                if c == 'W':
-                    x -= 1
-                elif c == 'E':
-                    x += 1
-                elif c == 'N':
-                    y += 1
-                elif c == 'S':
-                    y -= 1
+                new_nodes = []
 
-                coord = str(x) + ',' + str(y)
+                for n in nodes:
+                    #print("working with", (n.x, n.y))
+                    x = n.x
+                    y = n.y
 
-                if coord not in nodes_by_coordinate:
-                    nodes_by_coordinate[coord] = Node(x, y)
+                    if c == 'W':
+                        x -= 1
+                    elif c == 'E':
+                        x += 1
+                    elif c == 'N':
+                        y += 1
+                    elif c == 'S':
+                        y -= 1
 
-                dest_node = nodes_by_coordinate[coord]
-                # print(coord, node, dest_node)
+                    coord = str(x) + ',' + str(y)
 
-                if c == 'W':
-                    node.W = dest_node
-                    dest_node.E = node
-                elif c == 'E':
-                    node.E = dest_node
-                    dest_node.W = node
-                elif c == 'N':
-                    node.N = dest_node
-                    dest_node.S = node
-                elif c == 'S':
-                    node.S = dest_node
-                    dest_node.N = node
+                    if coord not in nodes_by_coordinate:
+                        nodes_by_coordinate[coord] = Node(x, y)
 
-                node = dest_node
+                    next_node = nodes_by_coordinate[coord]
+
+                    # print(coord, node, dest_node)
+
+                    if c == 'W':
+                        n.W = next_node
+                        next_node.E = n
+                    elif c == 'E':
+                        n.E = next_node
+                        next_node.W = n
+                    elif c == 'N':
+                        n.N = next_node
+                        next_node.S = n
+                    elif c == 'S':
+                        n.S = next_node
+                        next_node.N = n
+
+                    new_nodes.append(next_node)
+
+                nodes = new_nodes
 
             i += 1
 
-        return i
+        return
 
-    n = Node(0, 0)
-    nodes_by_coordinate['0,0'] = n
-    process_node(n, 0, 0, s)
+    n_init = Node(0, 0)
+    nodes_by_coordinate['0,0'] = n_init
+    process_node(n_init, s)
 
-    return n
+    return n_init
 
 
 def longest_path(s):
-    queue = [(build_graph(s), 0)]
+    queue = [(build_graph(s), 0, None)]
     last_distance = 0
+    m = {}
 
     while queue:
-        n, distance = queue.pop(0)
-        print(distance, n)
+        n, distance, f = queue.pop(0)
+
+        if n.y not in m:
+            m[n.y] = {}
+
+        m[n.y][n.x] = n
+        #print(distance, (n.x, n.y), (f.x, f.y) if f else None, n)
         last_distance = distance
         n.visited = True
 
         if n.W and not n.W.visited:
-            queue.append((n.W, distance+1))
+            queue.append((n.W, distance+1, n))
 
         if n.E and not n.E.visited:
-            queue.append((n.E, distance+1))
+            queue.append((n.E, distance+1, n))
 
         if n.N and not n.N.visited:
-            queue.append((n.N, distance+1))
+            queue.append((n.N, distance+1, n))
 
         if n.S and not n.S.visited:
-            queue.append((n.S, distance+1))
+            queue.append((n.S, distance+1, n))
 
+    #print_map(m)
     return last_distance
+
+
+def print_map(m):
+    for y in range(-10, 10):
+        for x in range(-10, 10):
+            if y in m and x in m[y]:
+                c = '.'
+
+                if m[y][x].W and m[y][x].E and m[y][x].N and m[y][x].S:
+                    c = 'x'
+                elif m[y][x].W and m[y][x].E:
+                    c = '-'
+                elif m[y][x].N and m[y][x].S:
+                    c = '|'
+                elif m[y][x].N and m[y][x].E:
+                    c = '/'
+                elif m[y][x].N and m[y][x].W:
+                    c = '\\'
+
+                print(c, end='')
+            else:
+                print('#', end='')
+
+        print()
 
 
 def test_longest_path():
     assert longest_path('^WNE$') == 3
-    assert longest_path('^WN(E|WW)NEE$') == 8
+    assert longest_path('^WN(E|WW)NEE$') == 7
     assert longest_path('^ENWWW(NEEE|SSE(EE|N))$') == 10
     assert longest_path('^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$') == 18
+
+
+if __name__ == '__main__':
+    print(longest_path(open('input/20').read().strip()))
