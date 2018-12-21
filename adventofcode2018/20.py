@@ -14,6 +14,10 @@ class Node:
         return str({'n': (self.x, self.y), 'W': (self.W.x, self.W.y) if self.W else None, 'E': (self.E.x, self.E.y) if self.E else None, 'N': (self.N.x, self.N.y) if self.N else None, 'S': (self.S.x, self.S.y) if self.S else None})
 
 
+def k(n):
+    return str(n.x) + ',' + str(n.y)
+
+
 def build_graph(s):
     s = list(s[1:-1])
 
@@ -23,34 +27,37 @@ def build_graph(s):
         print(" down ")
         i = 0
         calling_node = node
-        nodes = [node]
-        exit_nodes = []
+        nodes = {k(node): node}
+        exit_nodes = {}
 
         while i < len(s):
             c = s[i]
 
             if c == '(':
-                process = list(nodes)
-                nodes = []
+                process = dict(nodes)
+                nodes = {}
 
-                for n in process:
+                for _, n in process.items():
                     skip, exit_nodes = process_node(n, s[i+1:])
-                    nodes += exit_nodes
+
+                    for _, n in exit_nodes.items():
+                        nodes[k(n)] = n
 
                 i += skip
-                print('up', len(nodes))
+                print(len(nodes))
                 #print("returned, continuing processing of ", s[i+1:])
                 #print([str(n) for n in exit_nodes])
             elif c == '|':
                 #print("this time we got to", nodes)
-                exit_nodes += nodes
-                nodes = [calling_node]
+                exit_nodes.update(nodes)
+                nodes = {k(calling_node): calling_node}
             elif c == ')':
-                return i + 1, nodes + exit_nodes
+                exit_nodes.update(nodes)
+                return i + 1, exit_nodes
             else:
-                new_nodes = []
+                new_nodes = {}
 
-                for n in nodes:
+                for _, n in nodes.items():
                     #print("working with", (n.x, n.y))
                     x = n.x
                     y = n.y
@@ -71,8 +78,6 @@ def build_graph(s):
 
                     next_node = nodes_by_coordinate[coord]
 
-                    # print(coord, node, dest_node)
-
                     if c == 'W':
                         n.W = next_node
                         next_node.E = n
@@ -86,7 +91,7 @@ def build_graph(s):
                         n.S = next_node
                         next_node.N = n
 
-                    new_nodes.append(next_node)
+                    new_nodes[k(n)] = next_node
 
                 nodes = new_nodes
 
@@ -105,9 +110,13 @@ def longest_path(s):
     queue = [(build_graph(s), 0, None)]
     last_distance = 0
     m = {}
+    over_1000 = 0
 
     while queue:
         n, distance, f = queue.pop(0)
+
+        if distance >= 1000:
+            over_1000 += 1
 
         if n.y not in m:
             m[n.y] = {}
@@ -130,7 +139,7 @@ def longest_path(s):
             queue.append((n.S, distance+1, n))
 
     #print_map(m)
-    return last_distance
+    return last_distance, over_1000
 
 
 def print_map(m):
