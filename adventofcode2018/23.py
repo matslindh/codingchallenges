@@ -81,6 +81,12 @@ def evaluate_nanos(f):
         print("y diff", abs(bots[v][0][1] - bots[best_idx][0][1]))
         print("z diff", abs(bots[v][0][2] - bots[best_idx][0][2]))
 
+        try:
+            best_idx = lens.index(best_intersect_count, best_idx + 1)
+        except ValueError:
+            break
+
+        continue
         for z in range(mid[2] - m_diff, mid[2] + m_diff):
             if z not in area:
                 area[z] = {}
@@ -102,11 +108,7 @@ def evaluate_nanos(f):
                         if d <= n[1]:
                             area[z][y][x] += 1
 
-            print(area)
-        try:
-            best_idx = lens.index(best_intersect_count, best_idx + 1)
-        except ValueError:
-            break
+            # print(area)
 
     print("best number in reach of", max(lens))
     print(lens.count(best_intersect_count))
