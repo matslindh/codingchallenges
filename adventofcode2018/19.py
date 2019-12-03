@@ -88,7 +88,7 @@ def execute(f, start_0=0):
 
             globals()[op_code](registers, int(in_a), int(in_b), int(out))
 
-            print(registers_pre, pc, op_code, in_a, in_b, out, registers)
+            print(pc, registers_pre, op_code, in_a, in_b, out, registers)
 
             if bound_to is not None:
                 pc = registers[bound_to]
@@ -110,5 +110,7 @@ def test_execute():
 if __name__ == '__main__':
     #print(execute(open('input/19')))
     print(execute(open('input/19'), start_0=1))
+
+    # b solved manually - it sums up all factors (including 1 and the number itself) of the number in register 2
 
 
