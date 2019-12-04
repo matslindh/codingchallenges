@@ -46,7 +46,7 @@ def snail_it_file(fname, header=True):
 
 
 def test_snail_it():
-    assert snail_it_file('input/04.test', header=False)
+    assert 14 == snail_it_file('input/04.test', header=False)
 
 
 if __name__ == '__main__':
