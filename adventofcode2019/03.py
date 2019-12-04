@@ -8,8 +8,7 @@ def grid_cabler(path1, path2, print_it=False):
     if print_it:
         print_grid(grid, 500)
 
-    d = 99999999999999
-    print(intersections)
+    d, travelled = 99999999999999, 999999999999999
 
     for intersection in intersections:
         dist = abs(intersection[0]) + abs(intersection[1])
@@ -17,12 +16,17 @@ def grid_cabler(path1, path2, print_it=False):
         if dist < d:
             d = dist
 
-    return d
+        travelled_d = grid[intersection[1]][intersection[0]][1] + grid[intersection[1]][intersection[0]][2]
+
+        if travelled_d < travelled:
+            travelled = travelled_d
+
+    return d, travelled
 
 
 def populate_grid_from_path(idx, grid, path, intersections):
     instructions = path.split(',')
-    x, y = 0, 0
+    x, y, d = 0, 0, 0
 
     for inst in instructions:
         delta_x, delta_y = 0, 0
@@ -39,17 +43,18 @@ def populate_grid_from_path(idx, grid, path, intersections):
         for i in range(0, int(inst[1:])):
             x += delta_x
             y += delta_y
+            d += 1
 
             if y not in grid:
                 grid[y] = {}
 
             if x not in grid[y]:
-                grid[y][x] = 0
+                grid[y][x] = {}
 
-            if grid[y][x] > 0 and grid[y][x] != idx:
+            if len(grid[y][x]) > 0 and idx not in grid[y][x]:
                 intersections.append((x, y))
 
-            grid[y][x] = idx
+            grid[y][x][idx] = d
 
 
 def print_grid(grid, dim):
@@ -67,9 +72,10 @@ def print_grid(grid, dim):
 
 
 def test_grid_cabler():
-    assert 6 == grid_cabler('R8,U5,L5,D3', 'U7,R6,D4,L4')
-    assert 135 == grid_cabler('R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51', 'U98,R91,D20,R16,D67,R40,U7,R15,U6,R7')
-    assert 159 == grid_cabler('R75,D30,R83,U83,L12,D49,R71,U7,L72', 'U62,R66,U55,R34,D71,R55,D58,R83', print_it=True)
+    answer, _ = grid_cabler('R8,U5,L5,D3', 'U7,R6,D4,L4')
+    assert 6 == answer
+    assert 135, 410 == grid_cabler('R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51', 'U98,R91,D20,R16,D67,R40,U7,R15,U6,R7')
+    assert 159, 610 == grid_cabler('R75,D30,R83,U83,L12,D49,R71,U7,L72', 'U62,R66,U55,R34,D71,R55,D58,R83', print_it=True)
 
 
 if __name__ == '__main__':
