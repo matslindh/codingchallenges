@@ -16,6 +16,7 @@ def evaluate(s):
     memory = [int(r.strip()) for r in s.split(',')]
     return run(memory)
 
+
 def find_parameters(s, goal):
     memory = [int(r.strip()) for r in s.split(',')]
 
