@@ -1,20 +1,18 @@
 import json
-import queue
 
 
 def navigate_maze_struct(strategy, f='input/MAZE.txt'):
     rooms = json.load(open(f))
-    counts = {'L': 0, 'R': 0, 'U': 0, 'D': 0}
 
     for row in rooms:
         for room in row:
             room['visited'] = False
 
-    que = queue.PriorityQueue()
-    que.put((0, rooms[0][0]))
+    queue = [(0, 0)]
 
-    while not que.empty():
-        pri, room = que.get()
+    while queue:
+        y, x = queue.pop()
+        room = rooms[y][x]
 
         if room['visited']:
             continue
@@ -24,20 +22,17 @@ def navigate_maze_struct(strategy, f='input/MAZE.txt'):
         if room['y'] == 499 and room['x'] == 499:
             return sum_visited(rooms)
 
-        if room['y'] < 499 and not room['syd'] and not rooms[room['y'] + 1][room['x']]['visited']:
-            que.put((strategy.index('D'), counts['D'], rooms[room['y'] + 1][room['x']]), )
+        for d in strategy:
+            if d == 'D' and room['y'] < 499 and not room['syd']:
+                queue.append((y + 1, x), )
+            elif d == 'U' and y > 0 and not room['nord']:
+                queue.append((y - 1, x), )
+            elif d == 'R' and x < 499 and not room['aust']:
+                queue.append((y, x + 1), )
+            elif d == 'L' and x > 0 and not room['vest']:
+                queue.append((y, x - 1), )
 
-        if room['y'] > 0 and not room['nord'] and not rooms[room['y'] - 1][room['x']]['visited']:
-            que.put((strategy.index('U'), rooms[room['y'] - 1][room['x']]), )
-
-        if room['x'] < 499 and not room['aust'] and not rooms[room['y']][room['x'] + 1]['visited']:
-            que.put((strategy.index('R'), rooms[room['y']][room['x'] + 1]), )
-
-        if room['x'] > 0 and not room['vest'] and not rooms[room['y']][room['x'] - 1]['visited']:
-            print((strategy.index('L'), rooms[room['y']][room['x'] - 1]), )
-            que.put((strategy.index('L'), rooms[room['y']][room['x'] - 1]), )
-
-    return -1
+    return None
 
 
 def sum_visited(rooms):
