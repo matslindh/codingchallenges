@@ -45,5 +45,4 @@ def sum_visited(rooms):
     return visited
 
 
-print(str(navigate_maze_struct('DRLU')) + " woop")
-print(navigate_maze_struct('RDLU'))
+print(abs(navigate_maze_struct('ULRD') - navigate_maze_struct('ULDR')))
