@@ -3,18 +3,13 @@ import json
 
 def navigate_maze_struct(strategy, f='input/MAZE.txt'):
     rooms = json.load(open(f))
-
-    for row in rooms:
-        for room in row:
-            room['visited'] = False
-
     queue = [(0, 0)]
 
     while queue:
         y, x = queue.pop()
         room = rooms[y][x]
 
-        if room['visited']:
+        if 'visited' in room:
             continue
 
         room['visited'] = True
@@ -36,13 +31,7 @@ def navigate_maze_struct(strategy, f='input/MAZE.txt'):
 
 
 def sum_visited(rooms):
-    visited = 0
-
-    for row in rooms:
-        for room in row:
-            visited += 1 if room['visited'] else 0
-
-    return visited
+    return sum([sum(['visited' in room for room in row]) for row in rooms])
 
 
 print(abs(navigate_maze_struct('ULRD') - navigate_maze_struct('ULDR')))
