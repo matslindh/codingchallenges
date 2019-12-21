@@ -5,40 +5,69 @@ def generate_generational_generations(inp):
     for gen_idx, line in enumerate(lines):
         generation = []
         
-        for inheritance in line.split(';'):
-            generation.append(
-                [(gen_idx, int(parent)) for parent in inheritance.split(',')]
-            )
+        for inherit_idx, inheritance in enumerate(line.split(';')):
+            generation.append({
+                'me': (gen_idx, inherit_idx),
+                'parents': [(gen_idx + 1, int(parent)) for parent in inheritance.split(',')],
+                'lineage': {(gen_idx, inherit_idx)} if gen_idx == 0 else set(),
+                'visit_count': 0,
+            })
 
         generations.append(generation)
             
     return generations
 
 
-def parental_guidance(generations):
-    parental = []
+def explore_generations(generations):
+    queue = []
+    max_c = len(generations[0]) // 2
+    last_gen = 0
+    best_visit_count = 0
+    doners = []
+    done = False
 
-    for generation in generations[::-1]:
-        parents = []
+    for initial in generations[0][1::2]:
+        queue.append(initial['me'])
 
-        for idx, individual in enumerate(generation):
-            parent_set = set(individual)
+    while len(queue):
+        gen, idx = queue.pop(0)
 
-            if parental:
-                for parent in individual:
-                    gen, elf = parent
-                    print(gen, elf)
-                    #parent_set |= parental[len(parental) - gen][elf]
+        if gen > last_gen:
+            last_gen = gen
 
-            parents.append(parent_set)
+            if done:
+                print("DONE BY")
+                print(sorted(doners))
+                return
 
-        parental.append(parents)
-    
-    import pprint
-    pprint.pprint(parental[len(parental) - 2])
-    pprint.pprint(parental[len(parental) - 1])
-    
+            print("New generation: " + str(last_gen))
 
-def test_generational_gaps():
-    generations = generate_generational_generations('input/generations.test.txt')
-    parental_guidance(generations)
+        me = generations[gen][idx]
+
+        p_l_l = len(me['lineage'])
+
+        if p_l_l > best_visit_count:
+            best_visit_count = p_l_l
+            print(str(best_visit_count) + ', ' + str(me['me']))
+
+        if p_l_l >= max_c:
+            done = True
+            doners.append(me['me'])
+
+        for p in me['parents']:
+            parent = generations[p[0]][p[1]]
+
+            if not parent['lineage']:
+                queue.append(p)
+
+            parent['lineage'] |= me['lineage']
+
+
+if __name__ == '__main__':
+    import time
+    start = time.time()
+    print('Generations generation')
+    generations = generate_generational_generations('input/generations.txt')
+    print("Exploring")
+    explore_generations(generations)
+    print(time.time() - start)
