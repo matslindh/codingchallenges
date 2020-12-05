@@ -3,7 +3,7 @@ def bitlify(s, true_char):
     l = len(s) - 1
 
     for idx, c in enumerate(s):
-        r |= (1 if c == true_char else 0) << (l - idx)
+        r |= (c == true_char) << (l - idx)
 
     return r
 
