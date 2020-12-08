@@ -1,7 +1,11 @@
+from cachetools import cached
+
+cities = {}
+
+
 def city_builder(f):
     lines = [x.strip() for x in open(f).readlines()]
     mode = 'cities'
-    cities = {}
     itinerary = []
 
     for line in lines:
@@ -29,30 +33,40 @@ def city_builder(f):
         while x != city['x']:
             x += 1 if x < city['x'] else -1
 
-            update_time(cities, x, y)
+            update_time(x, y)
 
         while y != city['y']:
             y += 1 if y < city['y'] else -1
 
-            update_time(cities, x, y)
+            update_time(x, y)
 
     return max([x['time'] for x in cities.values()]) - min([x['time'] for x in cities.values()])
 
 
-def update_time(cities, x, y):
+def update_time(x, y):
+    for city, update in get_time_updates(x, y).items():
+        cities[city]['time'] += update
+
+
+@cached(cache={})
+def get_time_updates(x, y):
+    updates = {}
+
     for city, props in cities.items():
         dist = abs(x - props['x']) + abs(y - props['y'])
 
         if dist == 0:
-            pass
+            updates[city] = 0
         elif dist < 5:
-            props['time'] += 0.25
+            updates[city] = 0.25
         elif dist < 20:
-            props['time'] += 0.5
+            updates[city] = 0.5
         elif dist < 50:
-            props['time'] += 0.75
+            updates[city] = 0.75
         else:
-            props['time'] += 1
+            updates[city] = 1
+
+    return updates
 
 
 def test_city_builder():
