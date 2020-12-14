@@ -1,3 +1,6 @@
+from math import lcm
+from itertools import combinations
+
 # https://math.stackexchange.com/questions/2218763/how-to-find-lcm-of-two-numbers-when-one-starts-with-an-offset
 def combine_phased_rotations(a_period, a_phase, b_period, b_phase):
     """Combine two phased rotations into a single phased rotation
@@ -66,27 +69,22 @@ def travelizer(goal, s):
 
 
 def alignmenter(inp):
-    periods = []
+    previous = None
 
     for xdx, x in enumerate(inp[1:]):
         if x is None:
             continue
 
-        periods.append(arrow_alignment(inp[0], x, -(xdx+1)))
+        period = lcm(inp[0], x)
+        offset = arrow_alignment(inp[0], x, -(xdx+1))
 
-    """            
-    for xdx, x in enumerate(inp[:-1]):
-        if x is None:
-            continue
+        if previous:
+            inner_offset = arrow_alignment(previous[1], period, offset - previous[0])
+            previous = (previous[0] + inner_offset, lcm(previous[1], period))
+        else:
+            previous = (offset, period)
 
-        for ydx, y in enumerate(inp[xdx+1:]):
-            ydx += xdx + 1
-            if y is None:
-                continue
-
-            print(x, y, xdx, ydx, y - ydx, x - xdx)
-            periods.append(arrow_alignment(x, y, 2))"""
-    print(periods)
+    return previous[0]
 
 
 def test_travelizer():
@@ -94,9 +92,14 @@ def test_travelizer():
 
 
 def test_alignmenter():
-    #assert alignmenter([7, 6]) == 3417
     assert alignmenter([17, None, 13, 19]) == 3417
+    assert alignmenter([67, 7, 59, 61]) == 754018
+    assert alignmenter([67, None, 7, 59, 61]) == 779210
+    assert alignmenter([67, 7, None, 59, 61]) == 1261476
+    assert alignmenter([1789, 37, 47, 1889]) == 1202161486
+    assert alignmenter([7, 13, None, None, 59, None, 31, 19]) == 1068781
 
 
 if __name__ == '__main__':
     print(travelizer(1002632, '23,x,x,x,x,x,x,x,x,x,x,x,x,41,x,x,x,x,x,x,x,x,x,829,x,x,x,x,x,x,x,x,x,x,x,x,13,17,x,x,x,x,x,x,x,x,x,x,x,x,x,x,29,x,677,x,x,x,x,x,37,x,x,x,x,x,x,x,x,x,x,x,x,19'))
+    print(alignmenter([int(x) if x != 'x' else None for x in '23,x,x,x,x,x,x,x,x,x,x,x,x,41,x,x,x,x,x,x,x,x,x,829,x,x,x,x,x,x,x,x,x,x,x,x,13,17,x,x,x,x,x,x,x,x,x,x,x,x,x,x,29,x,677,x,x,x,x,x,37,x,x,x,x,x,x,x,x,x,x,x,x,19'.split(',')]))
