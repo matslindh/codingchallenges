@@ -115,6 +115,7 @@ def populate_definition_struct(tiles_to_parse):
     def populate(k, t):
         def s(k_1, k_2, val):
             k_2 = ba2int(k_2)
+
             if k_2 not in available[k_1]:
                 available[k_1][k_2] = []
 
@@ -125,20 +126,29 @@ def populate_definition_struct(tiles_to_parse):
             'tile': t,
         }
 
-        s('left', left(tile), t_def)
-        s('right', right(tile), t_def)
-        s('top', top(tile), t_def)
-        s('bottom', bottom(tile), t_def)
+        s('left', left(t), t_def)
+        s('right', right(t), t_def)
+        s('top', top(t), t_def)
+        s('bottom', bottom(t), t_def)
 
     for t_id, tile in tiles_to_parse.items():
         mirrored = flip_y(tile)
         populate(t_id, tile)
+
+        for _ in range(0, 3):
+            tile = rotate(tile)
+            populate(t_id, tile)
+
         populate(t_id, mirrored)
+
+        for _ in range(0, 3):
+            mirrored = rotate(mirrored)
+            populate(t_id, mirrored)
 
     return available
 
 
-def layout_tiles(tiles):
+def layout_tiles(tiles, definition_struct):
     dim = int(sqrt(len(tiles)))
     layout = []
 
@@ -155,43 +165,193 @@ def layout_tiles(tiles):
     }
 
     for tile_id, tile in tiles.items():
-        attempt_layout(tiles, tile_id, tile, data)
+        attempt_layout(tiles, tile_id, tile, data, dim, definition_struct)
 
         for _ in range(0, 3):
             tile = rotate(tile)
-            attempt_layout(tiles, tile_id, tile, data)
+            attempt_layout(tiles, tile_id, tile, data, dim, definition_struct)
 
-        flip_y(tile)
+        tile = flip_y(tile)
 
-        attempt_layout(tiles, tile_id, tile, data)
+        attempt_layout(tiles, tile_id, tile, data, dim, definition_struct)
 
         for _ in range(0, 3):
             tile = rotate(tile)
-            attempt_layout(tiles, tile_id, tile, data)
+            attempt_layout(tiles, tile_id, tile, data, dim, definition_struct)
+
+    return data
 
 
-def attempt_layout(tiles, tile_id, tile, data, x=0, y=0):
+def print_id_layout(layout):
+    print()
+
+    for row in layout:
+        for tile in row:
+            print('None' if not tile else tile['id'], end='  ')
+
+        print()
+
+    print()
+
+
+def print_solution(layout):
+    print_id_layout(layout)
+    print('Solution: ' + str(layout[0][0]['id'] * layout[-1][0]['id'] * layout[0][-1]['id'] * layout[-1][-1]['id']))
+    img = make_image(layout)
+
+    print('Seamonsters')
+
+    img_flipped = flip_y(img)
+
+    for _ in range(0, 4):
+        seamonsters, waves = count_seamonsters(img)
+
+        if seamonsters:
+            print(waves)
+            break
+
+        seamonsters, waves = count_seamonsters(img_flipped)
+
+        if seamonsters:
+            print(waves)
+            break
+
+        img = rotate(img)
+        img_flipped = rotate(img_flipped)
+        print("rotate")
+
+    import sys
+    sys.exit()
+
+
+def attempt_layout(tiles, tile_id, tile, data, dim, definition_struct, x=0, y=0):
     data['used'].add(tile_id)
-    data['layout'][x][y] = tile
+    data['layout'][y][x] = {
+        'id': tile_id,
+        'tile': tile,
+    }
 
-    if x > 0 and y > 0:
-        # consider top and left IF SPACE
-        # FIXME: We need to determine how to switch x/y to next row before iterating
-        pass
-    elif y > 0:
-        # consider top only
-        pass
+    if x == dim - 1 and y == dim - 1:
+        print_solution(data['layout'])
+
+    next_x = x + 1
+    next_y = y
+
+    if next_x % dim == 0:
+        next_y = y + 1
+        next_x = 0
+
+    if next_x > 0 and next_y > 0:
+        r = ba2int(right(data['layout'][next_y][next_x-1]['tile']))
+        b = ba2int(bottom(data['layout'][next_y-1][next_x]['tile']))
+
+        if r in definition_struct['left'] and b in definition_struct['top']:
+            possible = []
+
+            for l_t in definition_struct['left'][r]:
+                for t_t in definition_struct['top'][b]:
+                    if l_t == t_t:
+                        possible.append(l_t)
+
+            for n_tile in possible:
+                if n_tile['id'] in data['used']:
+                    continue
+
+                attempt_layout(tiles, n_tile['id'], n_tile['tile'], data=data, dim=dim, definition_struct=definition_struct, x=next_x, y=next_y)
+    elif next_y > 0:
+        r = ba2int(bottom(data['layout'][next_y-1][next_x]['tile']))
+
+        if r in definition_struct['top']:
+            for n_tile in definition_struct['top'][r]:
+                if n_tile['id'] in data['used']:
+                    continue
+
+                attempt_layout(tiles, n_tile['id'], n_tile['tile'], data=data, dim=dim, definition_struct=definition_struct, x=next_x, y=next_y)
     else:
-        # consider left only
-        pass
+        r = ba2int(right(data['layout'][y][next_x-1]['tile']))
 
-    data['layout'][x][y] = None
-    data['user'].remove(tile_id)
+        if r in definition_struct['left']:
+            for n_tile in definition_struct['left'][r]:
+                if n_tile['id'] in data['used']:
+                    continue
+
+                attempt_layout(tiles, n_tile['id'], n_tile['tile'], data=data, dim=dim, definition_struct=definition_struct, x=next_x, y=next_y)
+
+    data['layout'][y][x] = None
+    data['used'].remove(tile_id)
 
 
+def make_image(layout):
+    from copy import deepcopy
 
-our_tiles = read_tiles('input/20.test')
-layout_tiles(our_tiles)
-# Spprint.pprint(populate_definition_struct(our_tiles))
+    result = deepcopy(layout)
+
+    for row in result:
+        for tile in row:
+            del tile['tile'][0]
+            del tile['tile'][-1]
+
+            for t_row in tile['tile']:
+                del t_row[0]
+                del t_row[-1]
+
+    image = []
+
+    for y in range(0, len(result)):
+        for inner_y in range(0, 8):
+            row = bitarray()
+
+            for x in range(0, len(result)):
+                row.extend(result[y][x]['tile'][inner_y])
+
+            image.append(row)
+
+    return image
+
+
+def count_seamonsters(image):
+    seamonster = [
+        bitarray('00000000000000000010'),
+        bitarray('10000110000110000111'),
+        bitarray('01001001001001001000'),
+    ]
+
+    seamonster_row_len = len(seamonster[0])
+    seamonsters = 0
+
+    for y in range(0, len(image) - 2):
+        for x in range(0, len(image[0]) - seamonster_row_len):
+            found = True
+
+            for ridx, r in enumerate(seamonster):
+                if r & image[y+ridx][x:x+seamonster_row_len] != r:
+                    found = False
+                    break
+
+            if found:
+                print("found a seamonster at " + str(x) + ', ' + str(y))
+                seamonsters += 1
+
+                for ridx, r in enumerate(seamonster):
+                    k = r[:]
+                    k.invert()
+                    image[y + ridx][x:x + seamonster_row_len] &= k
+
+    c = 0
+
+    for row in image:
+        c += row.count()
+
+    return seamonsters, c
+
+
+#our_tiles = read_tiles('input/20.test')
+#definition_struct_source = populate_definition_struct(our_tiles)
+#print(layout_tiles(our_tiles, definition_struct=definition_struct_source))
+
+
+our_tiles = read_tiles('input/20')
+definition_struct_source = populate_definition_struct(our_tiles)
+print(layout_tiles(our_tiles, definition_struct=definition_struct_source))
 
 
