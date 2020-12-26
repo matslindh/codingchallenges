@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Profiling
+*.lprof
+
 # Distribution / packaging
 .Python
 env/
