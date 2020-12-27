@@ -1,81 +1,117 @@
-from collections import deque
+import json
+from typing import List
 
-@profile
+
+class Node:
+    def __init__(self, val):
+        self.next = None
+        self.val = val
+
+    def __str__(self):
+        return self.val + ', next: ' + id(self.next)
+
+
+class FastList:
+    def __init__(self, seq):
+        self.node_map = {}
+
+        prev = None
+        n = None
+
+        for s in seq:
+            n = Node(s)
+            self.node_map[s] = n
+
+            if prev:
+                prev.next = n
+            else:
+                self.root = n
+
+            prev = n
+
+        if n:
+            n.next = self.root
+
+    def node_from_val(self, val) -> Node:
+        return self.node_map[val]
+
+    def rotate(self) -> Node:
+        current = self.root
+        self.root = self.root.next
+        return current
+
+    def extract(self, current, next_count=3) -> List[Node]:
+        nodes = []
+        node = current
+
+        for i in range(0, next_count):
+            nodes.append(node.next)
+            node = node.next
+
+        current.next = node.next
+
+        if self.root in nodes:
+            self.root = current.next
+
+        return nodes
+
+    def insert(self, n: Node, nodes: List[Node]):
+        old_next = n.next
+        n.next = nodes[0]
+        nodes[-1].next = old_next
+
+    def print_seq(self):
+        root = self.root
+        n = self.root
+
+        while n.next != root:
+            print(n.val, end=' ')
+            n = n.next
+
+
 def play(cups, iterations=100):
     m = max(cups)
-    dq = deque(cups)
-    indices = {}
-
-    for cidx, c in enumerate(cups):
-        indices[c] = cidx
-
+    fl = FastList(cups)
+    
     while iterations:
-        current = original_current = dq.popleft()
-        extracted = (dq.popleft(), dq.popleft(), dq.popleft())
+        current = fl.rotate()
+        extracted = fl.extract(current)
+        extracted_labels = [n.val for n in extracted]
+        current_label = current.val
+        destination_node = None
 
         while True:
-            current -= 1
+            current_label -= 1
             
-            if current < 1:
-                current = m
+            if current_label < 1:
+                current_label = m
 
-            if current not in extracted:
-                break
+            if current_label in extracted_labels:
+                continue
 
-        # four has disappeared in front
-        dest_idx = indices[c] - 4
-        dq.insert(dest_idx+1, extracted[2])
-        dq.insert(dest_idx+1, extracted[1])
-        dq.insert(dest_idx+1, extracted[0])
-        dq.append(original_current)
+            destination_node = fl.node_from_val(current_label)
+            break
+
+        fl.insert(destination_node, extracted)
         iterations -= 1
 
-        if iterations % 1000 == 0:
-            return list(dq)
+        if iterations % 50000 == 0:
             print(iterations)
 
-    return list(dq)
+    return fl.node_from_val(1)
 
 
-def extract(cups, idx):
-    end = (idx + 3) % len(cups)
+def order_after_one(n_in):
+    vals = []
+    n = n_in
 
-    if end < idx:
-        if end == 4:
-            to_insert = cups[0:4]
-            del cups[0:4]
-        else:
-            to_insert = cups[idx:] + cups[0:end]
-            del cups[idx:]
-            del cups[0:end]
-    else:
-        to_insert = cups[idx:idx+3]
-        del cups[idx:idx+3]
+    while n.next != n_in:
+        vals.append(n.val)
+        n = n.next
 
-    return to_insert
+    vals.append(n.val)
 
-
-def order_after_one(cups):
-    idx = cups.index(1)
-    return cups[idx+1:] + cups[:idx]
-
-
-def test_extract():
-    l = [1, 2, 3, 4, 5, 6]
-    assert extract(l, 0) == [1, 2, 3]
-    assert l == [4, 5, 6]
-
-    l = [1, 2, 3, 4, 5, 6]
-    assert extract(l, 5) == [6, 1, 2]
-    assert l == [3, 4, 5]
-
-    l = [1, 2, 3, 4, 5, 6]
-    assert extract(l, 4) == [5, 6, 1]
-    assert l == [2, 3, 4]
-
-
-def test_order_after_one():
-    assert order_after_one([int(x) for x in '328915467']) == [int(x) for x in '54673289']
+    return vals[1:]
 
 
 def test_play_and_order():
@@ -102,9 +138,14 @@ if __name__ == '__main__':
     cups = [int(x) for x in '523764819']
     cups.extend(list(range(10, 1000001)))
 
-    result = play(cups, 1000000)
-    r_idx = result.index(1)
-    print(result[r_idx+1], result[r_idx+2], result[r_idx+1] * result[r_idx+2])
+    cups_test = [int(x) for x in '389125467']
+    cups_test.extend(list(range(10, 1000001)))
+
+    result = play(cups_test, 10000000)
+    print(result.next.val, result.next.next.val, result.next.val * result.next.next.val)
+
+    result = play(cups, 10000000)
+    print(result.next.val, result.next.next.val, result.next.val * result.next.next.val)
 
 """
     cups = [int(x) for x in '389125467']
