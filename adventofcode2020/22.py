@@ -25,27 +25,30 @@ def solve(p1, p2):
     return s
 
 
-v2_cache = {}
-
-
+#@profile
 def solve_v2(p1, p2):
+    v2_cache = {}
     print(p1, p2)
     print("+", end='')
-    cache_key = (tuple(p1), tuple(p2))
 
-    if cache_key in v2_cache:
-        print("/", end='')
-        return True, []
-
-    s = sorted(p1 + p2)
+    """s = sorted(p1 + p2)
 
     if s[0] > len(s) or s[1] > len(s):
         if max(p1) > max(p2):
             return True, []
 
-        return False, []
+        return False, []"""
 
     while p1 and p2:
+        cache_key = ','.join(str(x) for x in p1) + '|' + ','.join(str(x) for x in p2)
+        #cache_key = (tuple(p1), tuple(p2))
+
+        if cache_key in v2_cache:
+            print("/", end='')
+            return True, []
+
+        v2_cache[cache_key] = True
+
         c1 = p1.pop(0)
         c2 = p2.pop(0)
 
@@ -86,24 +89,34 @@ def read_and_solve(f, game=solve):
     return game(p1, p2)
 
 
+def result_to_int(l):
+    best = list(enumerate(l))
+    s = 0
+
+    for bidx, val in best:
+        s += (len(best) - bidx) * val
+
+    return s
+
+
+
 def test_solve():
     assert read_and_solve('input/22.test') == 306
 
 
 def test_solve_v2():
-    assert read_and_solve('input/22.test', game=solve_v2) == 291
+    winner, result = read_and_solve('input/22.test', game=solve_v2)
+    assert result_to_int(result) == 291
+
+
+def test_solve_loop_v2():
+    winner, result = read_and_solve('input/22-2.test', game=solve_v2)
+    assert result_to_int(result) == 0
 
 
 if __name__ == '__main__':
     print(read_and_solve('input/22'))
     winner, result = read_and_solve('input/22', game=solve_v2)
-
-    s = 0
-    best = list(enumerate(result))
-
-    for bidx, val in best:
-        s += (len(best) - bidx) * val
-
-    print(s)
-
+    print(result)
+    print(result_to_int(result))
 
