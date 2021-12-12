@@ -18,10 +18,13 @@ def count_categories_to_keep(lines: List[str]):
                 has_gifts = True
                 idx += 1
             elif line.startswith('K'):
-                has_gifts, idx = recurse(idx + 1, level + 1)
+                category_has_gifts, idx = recurse(idx + 1, level + 1)
 
-                if has_gifts:
+                if category_has_gifts:
                     kept.append(current)
+
+                if not has_gifts:
+                    has_gifts = category_has_gifts
             else:
                 idx += 1
 
@@ -32,7 +35,8 @@ def count_categories_to_keep(lines: List[str]):
 
 
 def test_count_categories_to_keep():
-    assert count_categories_to_keep(open('input/12.test', encoding='utf-8').read().splitlines())
+    assert count_categories_to_keep(open('input/12.test', encoding='utf-8').read().splitlines()) == 5
+    assert count_categories_to_keep(open('input/12.test2', encoding='utf-8').read().splitlines()) == 5
 
 
 if __name__ == '__main__':
