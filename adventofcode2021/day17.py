@@ -2,7 +2,6 @@ def mission_control(x, y):
     x_low, x_high = x
     y_low, y_high = y
 
-    possible = set()
     highest = []
 
     for x_init in range(1, 500):
@@ -12,7 +11,7 @@ def mission_control(x, y):
             x_pos, y_pos = 0, 0
             current_best = 0
 
-            while x_pos < x_high:
+            while x_pos <= x_high:
                 x_pos += x_v
                 y_pos += y_v
 
@@ -23,7 +22,6 @@ def mission_control(x, y):
 
                 if x_low <= x_pos <= x_high and y_low <= y_pos <= y_high:
                     highest.append((current_best, x_init, y_init))
-                    possible.add((x_init, y_init))
                     break
 
                 if y_pos < y_low:
@@ -35,7 +33,7 @@ def mission_control(x, y):
                 if y_pos > current_best:
                     current_best = y_pos
 
-    return max(highest), len(possible)
+    return max(highest), len(highest)
 
 
 def test_mission_control():
