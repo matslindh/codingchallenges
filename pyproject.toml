@@ -8,6 +8,7 @@ authors = ["Mats Lindh <mats@lindh.no>"]
 python = "^3.11"
 pytest = "^7.2.0"
 haversine = "^2.5.1"
+tqdm = "^4.64.1"
 
 [tool.poetry.dev-dependencies]
 
