@@ -1,3 +1,5 @@
+import math
+
 
 def parse_lines(lines):
     nodes = {}
@@ -33,7 +35,7 @@ def navigate_parallel(network):
         node: {
             "moves": 0,
             "current": node,
-            "finishes_at": set(),
+            "finishes_at": [],
         }
         for node in network['nodes'].keys() if node[-1] == 'A'
     }
@@ -42,20 +44,29 @@ def navigate_parallel(network):
 
     while True:
         instr = network['instructions'][moves % instr_num]
+        decided = True
 
         for node, node_data in nodes.items():
             node_data['current'] = network["nodes"][node_data['current']][0 if instr == 'L' else 1]
             node_data['moves'] += 1
 
             if node_data['current'][-1] == 'Z':
-                node_data['finishes_at'].add(moves)
+                node_data['finishes_at'].append(moves)
+
+            if len(node_data['finishes_at']) < 2:
+                decided = False
 
         moves += 1
 
-        if moves > 50000:
+        if decided:
             break
 
-    pass
+    finishing_diffs = [
+        node['finishes_at'][1] - node['finishes_at'][0]
+        for node in nodes.values()
+    ]
+
+    return math.lcm(*finishing_diffs)
 
 
 def test_navigate_parallel():
