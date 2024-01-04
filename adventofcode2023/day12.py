@@ -51,13 +51,15 @@ def debug_current(current):
 
     return s
 
+def can_place(cache, possible_placements, required_placements, idx, groups_left, current=None):
+    cache_key = (idx, groups_left)
 
+    if cache_key in cache:
+        return cache[cache_key]
 
-def can_place(possible_placements, required_placements, idx, groups_left, current=None):
     if not current:
         current = []
 
-    remaining_positions = sum(groups_left) + len(groups_left) - 1
     matching_positions = 0
     new_idx = idx
     placements_len = len(possible_placements)
@@ -70,12 +72,35 @@ def can_place(possible_placements, required_placements, idx, groups_left, curren
         if groups_left[0] < required_placements[new_idx]:
             break
 
+        previous_index = 0
+        previous_length = 0
+
+        if current:
+            previous_length, previous_index = current[-1]
+
+        if any(required_placements[previous_index+previous_length:new_idx]):
+            break
+
         if len(groups_left) == 1:
+            is_valid = True
             current.append((groups_left[0], new_idx))
             s = debug_current(current)
             current.pop()
-            matching_positions += 1
+
+            for offset, future_required_placement in enumerate(required_placements[new_idx:]):
+                if future_required_placement == 0:
+                    continue
+
+                if groups_left[0] - offset < future_required_placement:
+                    is_valid = False
+                    break
+
             new_idx += 1
+
+            if not is_valid:
+                continue
+
+            matching_positions += 1
             continue
 
         next_idx = new_idx + groups_left[0]
@@ -89,7 +114,8 @@ def can_place(possible_placements, required_placements, idx, groups_left, curren
 
         current.append((groups_left[0], new_idx))
 
-        matching_positions += can_place(possible_placements,
+        matching_positions += can_place(cache,
+                                        possible_placements,
                                         required_placements,
                                         next_idx + 1,
                                         groups_left[1:],
@@ -103,12 +129,23 @@ def can_place(possible_placements, required_placements, idx, groups_left, curren
 
         new_idx += required_placements[new_idx] or 1
 
+    cache[cache_key] = matching_positions
     return matching_positions
 
 def arrangements(pattern, groups):
     possible_placements, required_placements = get_possible_placements(pattern)
 
-    return can_place(possible_placements, required_placements, 0, groups_left=groups)
+    return can_place({}, possible_placements, required_placements, 0, groups_left=groups)
+
+
+def triple_arrangements(pattern, groups):
+    pattern += '?'
+    pattern *= 5
+    pattern = pattern[:-1]
+    groups *= 5
+    possible_placements, required_placements = get_possible_placements(pattern)
+
+    return can_place({}, possible_placements, required_placements, 0, groups_left=groups)
 
 
 def test_possible_placements():
@@ -122,15 +159,37 @@ def test_arrangements():
     assert arrangements("?#?#?#?#?#?#?#?", (1, 3, 1, 6)) == 1
     assert arrangements("????.#...#...", (4, 1, 1)) == 1
     assert arrangements("????.######..#####.", (1, 6, 5)) == 4
+    assert arrangements("?#####???????#..", (5,1,1,1)) == 6
+    assert arrangements("#?#???##??#.?#?#?#?", (3,3,1,7)) == 2
     assert arrangements("?###????????", (3, 2, 1)) == 10
+    assert arrangements("??.??#.???", (1,1,2)) == 6
+
+
+def test_triple_arrangements():
+    assert triple_arrangements("???.###", (1,1,3)) == 1
+    assert triple_arrangements(".??..??...?##.", (1,1,3)) == 16384
+    assert triple_arrangements("?#?#?#?#?#?#?#?", (1,3,1,6)) == 1
+    assert triple_arrangements("????.#...#...", (4,1,1)) == 16
+    assert triple_arrangements("????.######..#####.", (1,6,5)) == 2500
+    assert triple_arrangements("?###????????", (3,2,1)) == 506250
 
 
 if __name__ == '__main__':
     lines = open("input/12").read().splitlines()
-    summed = 0
-    for line in lines:
+    s = 0
+    s_triple = 0
+
+    for line_no, line in enumerate(lines):
         pattern, group = line.split(' ')
+        groups = tuple(int(g) for g in group.split(','))
+        arrangement_count = arrangements(pattern, groups)
+        triple_count = triple_arrangements(pattern, groups)
 
-        summed += arrangements(pattern, tuple(int(g) for g in group.split(',')))
+        print(line_no, line, arrangement_count, triple_count)
+        s += arrangement_count
+        s_triple += triple_count
 
-    print(summed)
+    print(s)
+    print(s_triple)
+
+# 20778962 too low
