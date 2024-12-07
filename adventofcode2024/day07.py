@@ -1,11 +1,13 @@
 from operator import mul, add
 from itertools import product
-from functools import reduce
 
 
-def operator_applicator(path):
+def concat(a: int, b: int):
+    return int(str(a) + str(b))
+
+
+def operator_applicator(path, ops):
     tasks = open(path).read().splitlines()
-    ops = (mul, add)
     valid_sum = 0
 
     def apply(cur, op_n):
@@ -18,9 +20,15 @@ def operator_applicator(path):
         valid = False
 
         for opseq in product(ops, repeat=len(values) - 1):
-            res = reduce(apply, zip(opseq, values[1:]), values[0])
+            ans = values[0]
 
-            if res == answer:
+            for op, value in zip(opseq, values[1:]):
+                ans = op(ans, value)
+
+                if ans > answer:
+                    break
+
+            if ans == answer:
                 valid = True
                 break
 
@@ -31,8 +39,10 @@ def operator_applicator(path):
 
 
 def test_operator_applicator():
-    assert operator_applicator('input/07.test') == 3749
+    assert operator_applicator('input/07.test', ops=(mul, add)) == 3749
+    assert operator_applicator('input/07.test', ops=(mul, add, concat)) == 11387
 
 
 if __name__ == '__main__':
-    print(operator_applicator('input/07'))
+    print(operator_applicator('input/07', ops=(mul, add)))
+    print(operator_applicator('input/07', ops=(mul, add, concat)))
