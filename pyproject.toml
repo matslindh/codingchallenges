@@ -3,10 +3,14 @@ name = "codingchallenges"
 version = "0.1.0"
 description = ""
 authors = ["Mats Lindh <mats@lindh.no>"]
+packages = [
+    { include = "common" },
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pytest = "^7.2.0"
+pytest = "^8.3.4"
 haversine = "^2.5.1"
 tqdm = "^4.64.1"
 bitstring = "^4.1.4"
