@@ -1,22 +1,25 @@
-[tool.poetry]
+[project]
 name = "codingchallenges"
 version = "0.1.0"
 description = ""
-authors = ["Mats Lindh <mats@lindh.no>"]
-packages = [
-    { include = "common" },
+authors = [{ name = "Mats Lindh", email = "mats@lindh.no" }]
+requires-python = ">=3.11,<4"
+dependencies = [
+    "pytest>=8.3.4",
+    "haversine>=2.5.1",
+    "tqdm>=4.64.1",
+    "bitstring>=4.1.4",
 ]
 
+[dependency-groups]
+dev = []
 
-[tool.poetry.dependencies]
-python = "^3.11"
-pytest = "^8.3.4"
-haversine = "^2.5.1"
-tqdm = "^4.64.1"
-bitstring = "^4.1.4"
+[tool.hatch.build.targets.sdist]
+include = ["common"]
 
-[tool.poetry.dev-dependencies]
+[tool.hatch.build.targets.wheel]
+include = ["common"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
