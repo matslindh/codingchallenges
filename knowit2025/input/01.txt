@@ -1,0 +1,250 @@
+ADD Klossesett
+ADD Robot
+ADD Kosedyr
+ADD Sparkesykkel
+PROCESS
+ADD Bilbane
+ADD Spill
+ADD Godteri
+ADD Sykkel
+PROCESS
+PROCESS
+ADD Bok
+PROCESS
+ADD Bok
+ADD Klossesett
+ADD Skøyter
+ADD Togbane
+ADD Bamse
+PROCESS
+PROCESS
+ADD Sparkesykkel
+COUNT
+ADD Godteri
+PROCESS
+COUNT
+ADD Fargestifter
+ADD Blyanter
+COUNT
+COUNT
+ADD ModelFly
+COUNT
+PROCESS
+COUNT
+ADD Brio-tog
+PROCESS
+COUNT
+COUNT
+PROCESS
+COUNT
+COUNT
+ADD Bilbane
+ADD Bamse
+PROCESS
+ADD Togbane
+ADD ModelFly
+ADD Bamse
+PROCESS
+ADD Robot
+COUNT
+ADD Bamse
+PROCESS
+ADD Godteri
+ADD Bilbane
+COUNT
+PROCESS
+ADD Fargestifter
+COUNT
+PROCESS
+PROCESS
+ADD Fargestifter
+ADD Spill
+COUNT
+PROCESS
+ADD Puslespill
+PROCESS
+PROCESS
+COUNT
+ADD Sparkesykkel
+ADD Lego
+ADD Bok
+COUNT
+ADD ModelFly
+ADD ModelFly
+COUNT
+ADD Robot
+COUNT
+PROCESS
+ADD Bamse
+ADD Klossesett
+PROCESS
+PROCESS
+ADD Robot
+PROCESS
+ADD Togbane
+ADD Fargestifter
+ADD Blyanter
+ADD Fargestifter
+ADD Togbane
+ADD Bamse
+ADD Spill
+ADD Kosedyr
+ADD Kosedyr
+PROCESS
+COUNT
+ADD Robot
+PROCESS
+COUNT
+ADD Brio-tog
+PROCESS
+PROCESS
+PROCESS
+ADD Bok
+COUNT
+ADD Lego
+ADD Puslespill
+ADD Klossesett
+COUNT
+PROCESS
+ADD Blyanter
+ADD Kosedyr
+ADD Robot
+ADD Sykkel
+COUNT
+ADD Fargestifter
+PROCESS
+PROCESS
+PROCESS
+PROCESS
+ADD Bamse
+ADD Sykkel
+ADD Klossesett
+PROCESS
+ADD Blyanter
+PROCESS
+ADD Kosedyr
+PROCESS
+ADD Blyanter
+PROCESS
+ADD Blyanter
+PROCESS
+PROCESS
+PROCESS
+PROCESS
+COUNT
+ADD Bamse
+COUNT
+ADD Godteri
+COUNT
+ADD Togbane
+ADD Blyanter
+PROCESS
+PROCESS
+ADD Klossesett
+COUNT
+ADD Klossesett
+ADD Skøyter
+PROCESS
+ADD Dukke
+ADD Spill
+ADD Spill
+ADD Blyanter
+ADD Brio-tog
+PROCESS
+ADD Godteri
+ADD ModelFly
+ADD Bok
+PROCESS
+COUNT
+ADD Brio-tog
+ADD Dukke
+ADD Sparkesykkel
+ADD ModelFly
+PROCESS
+ADD Bok
+PROCESS
+ADD Blyanter
+PROCESS
+ADD Lego
+ADD Klossesett
+COUNT
+ADD Robot
+ADD Sykkel
+ADD Sykkel
+ADD Klossesett
+COUNT
+PROCESS
+ADD Sjokolade
+PROCESS
+PROCESS
+ADD Spill
+ADD Sjokolade
+ADD Klossesett
+ADD Godteri
+ADD Dukke
+COUNT
+COUNT
+ADD Fargestifter
+PROCESS
+PROCESS
+ADD Sjokolade
+PROCESS
+PROCESS
+COUNT
+PROCESS
+COUNT
+PROCESS
+PROCESS
+PROCESS
+COUNT
+PROCESS
+ADD Robot
+ADD Dukke
+ADD Godteri
+COUNT
+ADD Bamse
+PROCESS
+ADD ModelFly
+COUNT
+COUNT
+PROCESS
+ADD Kosedyr
+COUNT
+ADD ModelFly
+ADD Bilbane
+ADD Dukke
+PROCESS
+ADD Brio-tog
+ADD Togbane
+PROCESS
+ADD ModelFly
+ADD Brio-tog
+COUNT
+PROCESS
+COUNT
+PROCESS
+ADD Kosedyr
+ADD Sykkel
+PROCESS
+PROCESS
+PROCESS
+PROCESS
+ADD Sjokolade
+PROCESS
+ADD Sjokolade
+ADD Blyanter
+ADD Bok
+ADD Kosedyr
+COUNT
+ADD Lego
+PROCESS
+PROCESS
+PROCESS
+ADD Godteri
+ADD Dukke
+PROCESS
+PROCESS
+ADD Robot
+ADD Fargestifter
+COUNT
+ADD Bok
