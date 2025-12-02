@@ -7,10 +7,4 @@ alphabet = [
 ]
 
 for offset, line in enumerate(rs('input/02.txt')):
-    ans = ''
-
-    for char in line:
-        idx = alphabet.index(char) - offset - 1
-        ans += alphabet[idx]
-
-    print(ans)
+    print(''.join(map(lambda char: alphabet[alphabet.index(char) - offset - 1], line)))
