@@ -10,4 +10,4 @@ def as_1d_ints(path):
 
 
 def rs(path):
-    return open(path).read().splitlines()
+    return open(path, encoding='utf-8').read().splitlines()
