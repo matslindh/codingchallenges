@@ -11,3 +11,12 @@ def as_1d_ints(path):
 
 def rs(path):
     return open(path, encoding='utf-8').read().splitlines()
+
+
+def lines_with_individual_digits(path):
+    return tuple(
+        map(
+            lambda line: tuple(map(int, line)),
+            rs(path)
+        )
+    )
